@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 const bodyParser = require("body-parser");
 const accountSid = 'AC85eb3c7abf9a7aeaac0dcfbd5c70efa8';
 const authToken = 'ef83b8fb6bb6ee176d437275c8bbaf5e';
