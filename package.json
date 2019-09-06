@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/FerZablah/integrador_seguridad#readme",
   "dependencies": {
+    "axios": "^0.19.0",
     "express": "^4.17.1",
     "twilio": "^3.33.4"
   }
