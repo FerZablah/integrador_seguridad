@@ -58,7 +58,7 @@ app.post('/sos', async (req, res) => {
                 .create({
                     from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
                     to: `whatsapp:${process.env.TWILIO_EMERGENCY_NUMBER}`,
-                    body: `SOS Necesito ayuda en: https://maps.google.com/?q=${req.body.lat},${req.body.lon} cerca de ${nombrePOI} con direccion en ${direccion}`
+                    body: `SOS Necesito ayuda en: https://maps.google.com/?q=${req.body.lat},${req.body.lon} cerca de ${nombrePOI} con direccion en ${direccionFinal}`
                 })
                 .then(message => {
                     resolve();
@@ -70,7 +70,7 @@ app.post('/sos', async (req, res) => {
         //Se envia un mensaje de exito (200) al cliente
         res.status(200).send();
     } catch (error) {
-        //console.log(error);
+        console.log(error);
         res.status(500).send();
     }
 });
