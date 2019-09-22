@@ -34,17 +34,18 @@ app.post('/sos', async (req, res) => {
         //Nombre del Punto de interes mas cercano
         const nombrePOI = response.data.response.venues[0].name;
         //Direccion ya en formato para envio de mensaje
-        let direccion = response.data.response.venues[0].location.formattedAddress;
-        direccion = direccion[0] + ' ' + direccion[1] + ' ' + direccion[2];
-        console.log(nombrePOI, direccion);
-        console.log(process.env.TWILIO_EMERGENCY_NUMBER);
+        let direcciones = response.data.response.venues[0].location.formattedAddress;
+        let direccionFinal = '';
+        direcciones.forEach(direccion => {
+            direccionFinal += direccion + ' ';
+        });
         //Se crea la llamada asincrona para enviar un SMS
         const sms = new Promise((resolve, reject) => {
             client.messages
                 .create({
                     from: process.env.TWILIO_SMS_NUMBER,
                     to: process.env.TWILIO_EMERGENCY_NUMBER,
-                    body: `SOS Necesito ayuda en: https://maps.google.com/?q=${req.body.lat},${req.body.lon} cerca de ${nombrePOI} con direccion en ${direccion}`
+                    body: `SOS Necesito ayuda en: https://maps.google.com/?q=${req.body.lat},${req.body.lon} cerca de ${nombrePOI} con direccion en ${direccionFinal}`
                 })
                 .then(message => {
                     resolve();
