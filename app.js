@@ -21,6 +21,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
     lon: String
 }
 */
+app.get('/', (req,res) => {
+    res.send('ok');
+});
 app.post('/sos', async (req, res) => {
     //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
     const response = await axios({
