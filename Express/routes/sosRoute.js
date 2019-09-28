@@ -1,19 +1,12 @@
-//Importar paquetes de NPM
-if (process.env.NODE_ENV !== 'production') require('dotenv').config()
+const sosSchema = require('../models/sos.js');
 const express = require('express');
-const app = express();
-const port = process.env.PORT || 4000; //Puerto 4000 o definido por Heroku
-const bodyParser = require("body-parser");
+const router = express.Router();
+const joi = require('@hapi/joi');
 //Llaves de conexion de Twilio
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 const axios = require('axios');
-
-//Ajustes de servidor con express
-app.use(bodyParser.json());//Permite recibir cuerpos JSON
-app.use(bodyParser.urlencoded({ extended: true }));
-
 //Post que recibe un cuerpo: 
 /*
 {
@@ -21,11 +14,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
     lon: String
 }
 */
-app.get('/', (req, res) => {
-    res.send('ok');
-});
-app.post('/sos', async (req, res) => {
-    try {
+router.post('/', async (req, res) => { 
+      try {
+        console.log(req.body);
+        const {error} = joi.validate(req.body, sosSchema.schema);
+        if(error) return res.status(400).send(error.message);
         //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
         const response = await axios({
             url: `https://api.foursquare.com/v2/venues/search?ll=${req.body.lat},${req.body.lon}&client_id=${process.env.FOURSQUARE_CLIENT_ID}&client_secret=${process.env.FOURSQUARE_SECRET}&v=20190905`,
@@ -74,7 +67,4 @@ app.post('/sos', async (req, res) => {
         res.status(500).send();
     }
 });
-//Funcion que monta el servidor en puerto especificado en la variable "port"
-app.listen(port, () => {
-    console.log(`integrador seguridad listening on port ${port}!`);
-});
+module.exports = router;
