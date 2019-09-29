@@ -14,50 +14,67 @@ const axios = require('axios');
     lon: String
 }
 */
-router.post('/', async (req, res) => { 
-      try {
-        console.log(req.body);
-        const {error} = joi.validate(req.body, sosSchema.schema);
-        if(error) return res.status(400).send(error.message);
-        //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
-        const response = await axios({
-            url: `https://api.foursquare.com/v2/venues/search?ll=${req.body.lat},${req.body.lon}&client_id=${process.env.FOURSQUARE_CLIENT_ID}&client_secret=${process.env.FOURSQUARE_SECRET}&v=20190905`,
-            method: 'get'
-        });
-        //Nombre del Punto de interes mas cercano
-        const nombrePOI = response.data.response.venues[0].name;
-        //Direccion ya en formato para envio de mensaje
-        let direcciones = response.data.response.venues[0].location.formattedAddress;
-        let direccionFinal = '';
-        direcciones.forEach(direccion => {
-            direccionFinal += direccion + ' ';
-        });
-        //Se crea la llamada asincrona para enviar un SMS
-        const sms = new Promise((resolve, reject) => {
+const generateMessageBody = (lat, lon, response) => {
+    //Nombre del Punto de interes mas cercano
+    const nombrePOI = response.data.response.venues[0].name;
+    //Direccion ya en formato para envio de mensaje
+    let direcciones = response.data.response.venues[0].location.formattedAddress;
+    let direccionFinal = '';
+    direcciones.forEach(direccion => {
+        direccionFinal += direccion + ' ';
+    });
+    return `SOS Necesito ayuda en: https://maps.google.com/?q=${lat},${lon} cerca de ${nombrePOI} con direccion en ${direccionFinal}`;
+}
+const sendSMS = (body) => {
+    return (
+        new Promise((resolve, reject) => {
             client.messages
                 .create({
                     from: process.env.TWILIO_SMS_NUMBER,
                     to: process.env.TWILIO_EMERGENCY_NUMBER,
-                    body: `SOS Necesito ayuda en: https://maps.google.com/?q=${req.body.lat},${req.body.lon} cerca de ${nombrePOI} con direccion en ${direccionFinal}`
+                    body
                 })
                 .then(message => {
                     resolve();
                 })
                 .done();
-        });
-        //Se crea la llamada asincrona para enviar un whatsapp
-        const whatsapp = new Promise((resolve, reject) => {
+        })
+    );
+}
+
+const sendWhatsapp = (body) => {
+    return (
+        new Promise((resolve, reject) => {
             client.messages
                 .create({
                     from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
                     to: `whatsapp:${process.env.TWILIO_EMERGENCY_NUMBER}`,
-                    body: `SOS Necesito ayuda en: https://maps.google.com/?q=${req.body.lat},${req.body.lon} cerca de ${nombrePOI} con direccion en ${direccionFinal}`
+                    body
                 })
                 .then(message => {
                     resolve();
                 })
                 .done();
+        })
+    );
+}
+
+router.post('/', async (req, res) => { 
+      try {
+        //Se valida que se reciban los datos correctos.
+        const {error} = joi.validate(req.body, sosSchema.schema);
+        if(error) return res.status(400).send(error.message);
+        //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
+        const foursquareResponse = await axios({
+            url: `https://api.foursquare.com/v2/venues/search?ll=${req.body.lat},${req.body.lon}&client_id=${process.env.FOURSQUARE_CLIENT_ID}&client_secret=${process.env.FOURSQUARE_SECRET}&v=20190905`,
+            method: 'get'
         });
+        //Se genera el cuerpo del mensaje
+        const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse);
+        //Se crea la llamada asincrona para enviar un SMS
+        const sms = sendSMS(body);
+        //Se crea la llamada asincrona para enviar un whatsapp
+        const whatsapp = sendWhatsapp(body);
         //Se espera a que ambas llamadas asincronas se completen
         await Promise.all([sms, whatsapp]);
         //Se envia un mensaje de exito (200) al cliente
