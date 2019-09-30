@@ -5,8 +5,11 @@ const joi = require('@hapi/joi');
 //Llaves de conexion de Twilio
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
+/*const accountSid = process.env.TWILIO_TEST_ACCOUNT_SID;
+const authToken = process.env.TWILIO_TEST_AUTH_TOKEN;*/
 const client = require('twilio')(accountSid, authToken);
 const axios = require('axios');
+const rpiMiddle = require('../middlewears/rpiClient');
 //Post que recibe un cuerpo: 
 /*
 {
@@ -60,7 +63,7 @@ const sendWhatsapp = (body) => {
     );
 }
 
-router.post('/', async (req, res) => { 
+router.post('/', /*rpiMiddle,*/ async (req, res) => { 
       try {
         //Se valida que se reciban los datos correctos.
         const {error} = joi.validate(req.body, sosSchema.schema);
@@ -75,13 +78,13 @@ router.post('/', async (req, res) => {
         //Se crea la llamada asincrona para enviar un SMS
         const sms = sendSMS(body);
         //Se crea la llamada asincrona para enviar un whatsapp
-        const whatsapp = sendWhatsapp(body);
+        //const whatsapp = sendWhatsapp(body);
         //Se espera a que ambas llamadas asincronas se completen
         await Promise.all([sms, whatsapp]);
         //Se envia un mensaje de exito (200) al cliente
         res.status(200).send();
     } catch (error) {
-        console.log(error);
+        console.log(error.response.statusText);
         res.status(500).send();
     }
 });
