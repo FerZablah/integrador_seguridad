@@ -49,7 +49,7 @@ const sendWhatsapp = (body) => {
             client.messages
                 .create({
                     from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-                    to: `whatsapp:${process.env.TWILIO_EMERGENCY_NUMBER}`,
+                    to: `whatsapp:${process.env.TWILIO_WHATSAPP_EMERGENCY_NUMBER}`,
                     body
                 })
                 .then(message => {
