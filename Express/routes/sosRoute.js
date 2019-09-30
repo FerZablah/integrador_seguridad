@@ -23,7 +23,8 @@ const generateMessageBody = (lat, lon, response) => {
     direcciones.forEach(direccion => {
         direccionFinal += direccion + ' ';
     });
-    return `SOS Necesito ayuda en: https://maps.google.com/?q=${lat},${lon} cerca de ${nombrePOI} con direccion en ${direccionFinal}`;
+    return `SOS Necesito ayuda en: https://maps.google.com/?q=${lat},${lon} 
+    cerca de ${nombrePOI} con direccion en ${direccionFinal}`;
 }
 const sendSMS = (body) => {
     return (
