@@ -85,7 +85,7 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         //Se envia un mensaje de exito (200) al cliente
         res.status(200).send();
     } catch (error) {
-        console.log(error.response.statusText);
+        console.log(error);
         res.status(500).send();
     }
 });
