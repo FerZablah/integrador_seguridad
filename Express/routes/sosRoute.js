@@ -67,6 +67,7 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
       try {
         //Se valida que se reciban los datos correctos.
         const {error} = joi.validate(req.body, sosSchema.schema);
+        console.log('JOI error, received' + req.body + "error", error.message);
         if(error) return res.status(400).send(error.message);
         //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
         const foursquareResponse = await axios({
