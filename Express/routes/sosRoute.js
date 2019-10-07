@@ -67,8 +67,10 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
       try {
         //Se valida que se reciban los datos correctos.
         const {error} = joi.validate(req.body, sosSchema.schema);
-        console.log('JOI error, received', req.body, error.message);
-        if(error) return res.status(400).send(error.message);
+        if(error){
+            console.log('JOI error, received', req.body, error);
+            return res.status(400).send(error);
+        } 
         //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
         const foursquareResponse = await axios({
             url: `https://api.foursquare.com/v2/venues/search?ll=${req.body.lat},${req.body.lon}&client_id=${process.env.FOURSQUARE_CLIENT_ID}&client_secret=${process.env.FOURSQUARE_SECRET}&v=20190905`,
