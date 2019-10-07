@@ -81,7 +81,7 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         //Se crea la llamada asincrona para enviar un SMS
         const sms = sendSMS(body);
         //Se crea la llamada asincrona para enviar un whatsapp
-        //const whatsapp = sendWhatsapp(body);
+        const whatsapp = sendWhatsapp(body);
         //Se espera a que ambas llamadas asincronas se completen
         await Promise.all([sms, whatsapp]);
         //Se envia un mensaje de exito (200) al cliente
