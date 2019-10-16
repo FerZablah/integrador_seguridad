@@ -12,6 +12,7 @@ const axios = require('axios');
 const rpiMiddle = require('../middlewears/rpiClient');
 const db = require("tnc_mysql_connector");
 const moment = require('moment');
+const uuidv1 = require('uuid/v1');
 //Post que recibe un cuerpo: 
 /*
 {
@@ -85,11 +86,11 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         //Se crea la llamada asincrona para enviar un whatsapp
         const whatsapp = sendWhatsapp(body);
         let insertEvento = Promise.resolve();
+        let idEvento;
         if(!req.body.idEvento){
             //Se crea evento en MySQL
-            let idEvento;
             insertEvento = new Promise((res, rej) => {
-                db.procedures.insertEvento(new moment.utc(), req.body.liga, req.body.idUsuario).then((arr) => {
+                db.procedures.insertEvento(new moment.utc(), uuidv1(), req.body.idUsuario).then((arr) => {
                     idEvento = arr[0].idEvento;
                     res();
                 });
@@ -98,7 +99,9 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         //Se espera a que ambas llamadas asincronas se completen
         await Promise.all([sms, whatsapp, insertEvento]);
         //Se envia un mensaje de exito (200) al cliente
-        res.status(200).send({idEvento});
+        if(idEvento)
+            return res.status(200).send({ idEvento });
+        return res.status(200).send();
     } catch (error) {
         console.log(error);
         res.status(500).send();
