@@ -82,9 +82,9 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         //Se genera el cuerpo del mensaje
         const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse);
         //Se crea la llamada asincrona para enviar un SMS
-        const sms = sendSMS(body);
+        /*const sms = sendSMS(body);
         //Se crea la llamada asincrona para enviar un whatsapp
-        const whatsapp = sendWhatsapp(body);
+        const whatsapp = sendWhatsapp(body);*/
         let insertEvento = Promise.resolve();
         let idEvento;
         if(!req.body.idEvento){
@@ -97,8 +97,9 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
             });
         }
         //Se espera a que ambas llamadas asincronas se completen
-        await Promise.all([sms, whatsapp, insertEvento]);
+        await Promise.all([/*sms, whatsapp,*/ insertEvento]);
         //Se envia un mensaje de exito (200) al cliente
+        console.log(idEvento);
         if(idEvento)
             return res.status(200).send({ idEvento });
         return res.status(200).send();
