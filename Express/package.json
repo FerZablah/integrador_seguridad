@@ -31,7 +31,7 @@
     "express": "^4.17.1",
     "husky": "^3.0.9",
     "tnc_mysql_connector": "^1.0.11",
-    "tnc_mysql_parser": "^1.1.9",
+    "tnc_mysql_parser": "^1.1.11",
     "twilio": "^3.33.4"
   }
 }
