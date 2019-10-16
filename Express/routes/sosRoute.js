@@ -2,7 +2,7 @@ const sosSchema = require('../models/sos.js');
 const express = require('express');
 const router = express.Router();
 const joi = require('@hapi/joi');
-//Llaves de conexion de Twilio
+//Llaves de conexion de Twilio 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 /*const accountSid = process.env.TWILIO_TEST_ACCOUNT_SID;
