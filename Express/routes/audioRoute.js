@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
             return res.status(400).send(error);
         } 
         let insertAudio = new Promise((res, rej) => {
-            db.procedures.insertAudio(req.body.idEvento, new moment.utc()).then(() => {
+            db.procedures.insertAudio(req.body.idEvento, new moment.utc(), req.body.liga).then(() => {
                 res();
             });
         });
