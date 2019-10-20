@@ -6,6 +6,7 @@ const moment = require('moment');
 
 router.get('/:idEvento', async (req, res) => { 
     try {
+        console.log(req.params.idEvento);
         if(!req.params.idEvento){
             console.log('No idEvento received');
             return res.status(400).send('No idEvento received');
