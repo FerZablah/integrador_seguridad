@@ -20,7 +20,7 @@ const uuidv1 = require('uuid/v1');
     lon: String
 }
 */
-const generateMessageBody = (lat, lon, response) => {
+const generateMessageBody = (lat, lon, response, liga) => {
     //Nombre del Punto de interes mas cercano
     const nombrePOI = response.data.response.venues[0].name;
     //Direccion ya en formato para envio de mensaje
@@ -30,7 +30,8 @@ const generateMessageBody = (lat, lon, response) => {
         direccionFinal += direccion + ' ';
     });
     return `SOS Necesito ayuda en: https://maps.google.com/?q=${lat},${lon} 
-    cerca de ${nombrePOI} con direccion en ${direccionFinal}`;
+    cerca de ${nombrePOI} con direccion en ${direccionFinal}.
+    Audios disponibles en: https://seguridad-integrador-web.herokuapp.com/home?q=${liga}`;
 }
 const sendSMS = (body) => {
     return (
@@ -42,6 +43,7 @@ const sendSMS = (body) => {
                     body
                 })
                 .then(message => {
+                    console.log(message);
                     resolve();
                 })
                 .done();
@@ -73,33 +75,38 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         if(error){
             console.log('JOI error, received', req.body, error);
             return res.status(400).send(error);
-        } 
+        }
+        let idEvento;
+        let ligaEvento;
+        if(!req.body.idEvento){
+            //Se crea evento en MySQL
+            ligaEvento = uuidv1();
+            arr = await db.procedures.insertEvento(new moment.utc(), ligaEvento, req.body.idUsuario);
+            idEvento = arr[0].idEvento;
+            ligaEvento = arr[0].liga;
+            
+        }
+        else{
+            //obtener liga del evento
+            arr = await db.procedures.getLigaEvento(req.body.idEvento);
+            console.log(arr)
+            ligaEvento = arr[0].liga;
+        }
+
         //Se llama al api de foursquare para obtener direccion mas cercana a las coordenadas
         const foursquareResponse = await axios({
             url: `https://api.foursquare.com/v2/venues/search?ll=${req.body.lat},${req.body.lon}&client_id=${process.env.FOURSQUARE_CLIENT_ID}&client_secret=${process.env.FOURSQUARE_SECRET}&v=20190905`,
             method: 'get'
         });
         //Se genera el cuerpo del mensaje
-        const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse);
+        const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse, ligaEvento);
         //Se crea la llamada asincrona para enviar un SMS
-        /*const sms = sendSMS(body);
+        //const sms = sendSMS(body);
         //Se crea la llamada asincrona para enviar un whatsapp
-        const whatsapp = sendWhatsapp(body);*/
-        let insertEvento = Promise.resolve();
-        let idEvento;
-        if(!req.body.idEvento){
-            //Se crea evento en MySQL
-            insertEvento = new Promise((res, rej) => {
-                db.procedures.insertEvento(new moment.utc(), uuidv1(), req.body.idUsuario).then((arr) => {
-                    idEvento = arr[0].idEvento;
-                    res();
-                });
-            });
-        }
+        //const whatsapp = sendWhatsapp(body);  
         //Se espera a que ambas llamadas asincronas se completen
-        await Promise.all([/*sms, whatsapp,*/ insertEvento]);
+        //await Promise.all([sms, whatsapp]);
         //Se envia un mensaje de exito (200) al cliente
-        console.log(idEvento);
         if(idEvento)
             return res.status(200).send({ idEvento });
         return res.status(200).send();
