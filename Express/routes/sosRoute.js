@@ -83,8 +83,6 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
             ligaEvento = uuidv1();
             arr = await db.procedures.insertEvento(new moment.utc(), ligaEvento, req.body.idUsuario);
             idEvento = arr[0].idEvento;
-            ligaEvento = arr[0].liga;
-            
         }
         else{
             //obtener liga del evento
@@ -101,11 +99,11 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         //Se genera el cuerpo del mensaje
         const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse, ligaEvento);
         //Se crea la llamada asincrona para enviar un SMS
-        //const sms = sendSMS(body);
+        const sms = sendSMS(body);
         //Se crea la llamada asincrona para enviar un whatsapp
-        //const whatsapp = sendWhatsapp(body);  
+        const whatsapp = sendWhatsapp(body);  
         //Se espera a que ambas llamadas asincronas se completen
-        //await Promise.all([sms, whatsapp]);
+        await Promise.all([sms, whatsapp]);
         //Se envia un mensaje de exito (200) al cliente
         if(idEvento)
             return res.status(200).send({ idEvento });
