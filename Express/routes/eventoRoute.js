@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 const db = require("tnc_mysql_connector");
 const moment = require('moment');
-const joi = require('@hapi/joi');
 
 router.get('/:idEvento', async (req, res) => { 
     try {
