@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require("tnc_mysql_connector");
 const usuarioSchema = require('../models/usuario.js');
+const joi = require('@hapi/joi');
 
 router.get('/:uid', async (req, res) => { 
     try {
