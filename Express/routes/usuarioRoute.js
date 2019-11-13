@@ -27,6 +27,7 @@ router.post('/', async (req, res) => {
         }
         const { uid, name, mail, phone } = req.body;
         const nombre = await db.procedures.insertUsuario(uid, name, mail, phone);
+        console.log('sending ', nombre[0]);
         res.send(nombre[0]);
     }
     catch(e) {
