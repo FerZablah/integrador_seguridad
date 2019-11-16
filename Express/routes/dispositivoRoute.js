@@ -33,4 +33,18 @@ router.get('/:uid', async (req, res) => {
     }
 });
 
+router.delete('/:id', async (req, res) => { 
+    try {
+        if(!req.params.id){
+            console.log('error, no id received');
+            return res.status(400).send();
+        } 
+        await db.procedures.deleteDispositivo(req.params.id);
+        res.send();
+    } catch (error) {
+        console.log(error);
+        res.status(500).send();
+    }
+});
+
 module.exports = router;
