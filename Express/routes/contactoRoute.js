@@ -9,8 +9,10 @@ router.get('/:uid', async (req, res) => {
         if(!req.params.uid){
             return res.status(400).send('No phone received');
         }
-        await db.procedures.getContactos(req.params.uid);
-        return res.send();
+        const contactos = await db.procedures.getContactos(req.params.uid);
+        console.log(req.params.uid);
+        console.log(contactos);
+        return res.send(contactos);
     } catch (error) {
         return res.status(400).send(error);
     }
@@ -24,7 +26,10 @@ router.post('/', async (req, res) => {
             return res.status(400).send(error);
         }
         await db.procedures.insertContacto(req.body.phone, req.body.name, req.body.uid);
-        return res.send();
+        return res.send({
+            telefono: req.body.phone,
+            nombre: req.body.name
+        });
     } catch (error) {
         return res.status(400).send(error);
     }
@@ -38,7 +43,10 @@ router.put('/', async (req, res) => {
             return res.status(400).send(error);
         }
         await db.procedures.updateContacto(req.body.old_phone, req.body.phone, req.body.name);
-        return res.send();
+        return res.send({
+            telefono: req.body.phone,
+            nombre: req.body.name
+        })
     } catch (error) {
         return res.status(400).send(error);
     }
@@ -55,3 +63,5 @@ router.delete('/:phone', async (req, res) => {
         return res.status(400).send(error);
     }
 });
+
+module.exports = router;
