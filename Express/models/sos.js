@@ -4,7 +4,8 @@ const schema = {
     lat: joi.string().required(),
     lon: joi.string().required(),
     idUsuario: joi.string().required(),
-    idEvento: joi.number().optional()
+    idEvento: joi.number().optional(),
+    idDispositivo: joi.string().required()
 }
 
 exports.schema= schema;
