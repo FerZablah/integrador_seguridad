@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
             console.log('JOI error, received', req.body, error);
             return res.status(400).send(error);
         }
-        await db.procedures.insertContacto(req.body.phone, req.body.name, req.body.uid);
+        await db.procedures.insertContacto('+52'+req.body.phone, req.body.name, req.body.uid);
         return res.send({
             telefono: req.body.phone,
             nombre: req.body.name
