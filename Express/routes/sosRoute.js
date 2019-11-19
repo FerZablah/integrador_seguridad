@@ -33,13 +33,13 @@ const generateMessageBody = (lat, lon, response, liga) => {
     cerca de ${nombrePOI} con direccion en ${direccionFinal}.
     Audios disponibles en: https://seguridad-integrador-web.herokuapp.com/home?q=${liga}`;
 }
-const sendSMS = (body) => {
+const sendSMS = (body, number) => {
     return (
         new Promise((resolve, reject) => {
             client.messages
                 .create({
                     from: process.env.TWILIO_SMS_NUMBER,
-                    to: process.env.TWILIO_EMERGENCY_NUMBER,
+                    to: number,
                     body
                 })
                 .then(message => {
@@ -51,13 +51,13 @@ const sendSMS = (body) => {
     );
 }
 
-const sendWhatsapp = (body) => {
+const sendWhatsapp = (body, number) => {
     return (
         new Promise((resolve, reject) => {
             client.messages
                 .create({
                     from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-                    to: `whatsapp:${process.env.TWILIO_WHATSAPP_EMERGENCY_NUMBER}`,
+                    to: `whatsapp:${number}`,
                     body
                 })
                 .then(message => {
@@ -98,12 +98,16 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         });
         //Se genera el cuerpo del mensaje
         const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse, ligaEvento);
-        //Se crea la llamada asincrona para enviar un SMS
-        const sms = sendSMS(body);
-        //Se crea la llamada asincrona para enviar un whatsapp
-        const whatsapp = sendWhatsapp(body);  
+        contacts = await db.procedures.getContactosByDispositivo(req.body.idDispositivo);
+        const promises = [];
+        contacts.forEach((contact) => {
+            //Se crea la llamada asincrona para enviar un SMS
+            promises.push(sendSMS(body, contact.numero));
+            //Se crea la llamada asincrona para enviar un whatsapp
+            promises.push(sendWhatsapp(body, contact.numero));  
+        })
         //Se espera a que ambas llamadas asincronas se completen
-        await Promise.all([sms, whatsapp]);
+        await Promise.all(promises);
         //Se envia un mensaje de exito (200) al cliente
         if(idEvento)
             return res.status(200).send({ idEvento });
