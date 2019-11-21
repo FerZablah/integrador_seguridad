@@ -12,17 +12,17 @@ router.get('/:idEvento', async (req, res) => {
             return res.status(400).send('No idEvento received');
         } 
         let audios = [];
-        let getAudios = new Promise((res, rej) => {
+        let getAudios = new Promise((resolve, rej) => {
             db.procedures.getAudios(req.params.idEvento).then((resAudios) => {
                 audios = resAudios;
-                res();
+                resolve();
             });
         });
         let usuario;
-        let getUsuario = new Promise((res, rej) => {
+        let getUsuario = new Promise((resolve, rej) => {
             db.procedures.getUsuarioEvento(req.params.idEvento).then((resUsuario) => {
                 usuario = resUsuario;
-                res();
+                resolve();
             });
         });
         await Promise.all([getAudios, getUsuario]);

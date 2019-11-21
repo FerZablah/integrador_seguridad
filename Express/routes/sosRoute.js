@@ -81,12 +81,12 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         if(!req.body.idEvento){
             //Se crea evento en MySQL
             ligaEvento = uuidv1();
-            arr = await db.procedures.insertEvento(new moment.utc(), ligaEvento, req.body.idUsuario, req.body.idDispositivo);
+            const arr = await db.procedures.insertEvento(new moment.utc(), ligaEvento, req.body.idUsuario, req.body.idDispositivo);
             idEvento = arr[0].idEvento;
         }
         else{
             //obtener liga del evento
-            arr = await db.procedures.getLigaEvento(req.body.idEvento);
+            const arr = await db.procedures.getLigaEvento(req.body.idEvento);
             console.log(arr)
             ligaEvento = arr[0].liga;
         }
@@ -98,7 +98,7 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         });
         //Se genera el cuerpo del mensaje
         const body = generateMessageBody(req.body.lat, req.body.lon, foursquareResponse, ligaEvento);
-        contacts = await db.procedures.getContactosByDispositivo(req.body.idDispositivo);
+        const contacts = await db.procedures.getContactosByDispositivo(req.body.idDispositivo);
         const promises = [];
         contacts.forEach((contact) => {
             //Se crea la llamada asincrona para enviar un SMS

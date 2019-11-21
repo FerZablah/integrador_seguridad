@@ -12,9 +12,9 @@ router.post('/', async (req, res) => {
             console.log('JOI error, received', req.body, error);
             return res.status(400).send(error);
         } 
-        let insertAudio = new Promise((res, rej) => {
+        let insertAudio = new Promise((resolve, rej) => {
             db.procedures.insertAudio(req.body.idEvento, new moment.utc(), req.body.liga).then(() => {
-                res();
+                resolve();
             });
         });
         await Promise.all([insertAudio]);
