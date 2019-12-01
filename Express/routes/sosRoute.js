@@ -30,8 +30,8 @@ const generateMessageBody = (lat, lon, response, liga) => {
         direccionFinal += direccion + ' ';
     });
     return `SOS Necesito ayuda en: https://maps.google.com/?q=${lat},${lon} 
-    cerca de ${nombrePOI} con direccion en ${direccionFinal}.
-    Audios disponibles en: https://seguridad-integrador-web.herokuapp.com/home?q=${liga}`;
+    cerca de ${nombrePOI} con dirección en ${direccionFinal}.
+    Escucha lo que está pasando en: https://seguridad-integrador-web.herokuapp.com/home?q=${liga}`;
 }
 const sendSMS = (body, number) => {
     return (
