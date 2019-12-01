@@ -81,7 +81,7 @@ router.post('/', /*rpiMiddle,*/ async (req, res) => {
         if(!req.body.idEvento){
             //Se crea evento en MySQL
             ligaEvento = uuidv1();
-            const arr = await db.procedures.insertEvento(new moment.utc(), ligaEvento, req.body.idUsuario, req.body.idDispositivo);
+            const arr = await db.procedures.insertEvento(new moment.utc(), ligaEvento, req.body.idDispositivo);
             idEvento = arr[0].idEvento;
         }
         else{
