@@ -8,5 +8,5 @@ WHERE Evento.liga = input_idEvento;
 END //
 DELIMITER ;
 /*
-CALL getAudios('0e0697b0-f04a-11e9-97a2-db1205a2b288');
+CALL getAudios('277a7af0-0a93-11ea-beb7-93b9567f9d62');
 */
