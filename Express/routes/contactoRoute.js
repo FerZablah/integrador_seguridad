@@ -31,6 +31,7 @@ router.post('/', async (req, res) => {
             nombre: req.body.name
         });
     } catch (error) {
+        console.log(error);
         return res.status(400).send(error);
     }
 });
